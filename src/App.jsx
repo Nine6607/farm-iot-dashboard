@@ -24,28 +24,27 @@ function App() {
   const addToCart = (product) => {
     const existing = cartItems().find(item => item.id === product.id);
     if (existing) {
-      updateQuantity(product.id, 1);
+      updateQuantity(existing.cartId, 1);
     } else {
+      // ใช้ cartId เป็น Key หลักเพื่อให้ Input ไม่หลุด Focus
       setCartItems([...cartItems(), { ...product, quantity: 1, cartId: Date.now() }]);
     }
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
 
-  // --- ฟังก์ชันอัปเดตจำนวน (รองรับทั้งปุ่มกดและพิมพ์เลข) ---
-  const updateQuantity = (id, change, absoluteValue = null) => {
+  const updateQuantity = (cartId, change, absoluteValue = null) => {
     setCartItems(cartItems().map(item => {
-      if (item.id === id) {
-        // ถ้าส่ง absoluteValue มา (จากการพิมพ์) ให้ใช้ค่านั้นเลย แต่ถ้าไม่มีให้ใช้การบวก/ลบ (จากปุ่ม)
+      if (item.cartId === cartId) {
         let newQty = absoluteValue !== null ? absoluteValue : item.quantity + change;
-        return { ...item, quantity: Math.max(1, newQty) }; // ขั้นต่ำ 1 ชิ้นเสมอ
+        return { ...item, quantity: Math.max(1, newQty) };
       }
       return item;
     }));
   };
 
-  const removeFromCart = (id) => {
-    setCartItems(cartItems().filter(item => item.id !== id));
+  const removeFromCart = (cartId) => {
+    setCartItems(cartItems().filter(item => item.cartId !== cartId));
   };
 
   const totalPrice = () => cartItems().reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -67,20 +66,21 @@ function App() {
 
       <main class="max-w-7xl mx-auto p-6">
         <header class="py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text">Next-Gen Farm Gear</h1>
+          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">Next-Gen Farm Gear</h1>
         </header>
 
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <For each={PRODUCTS}>{(product) => (
             <div class="bg-slate-900 rounded-3xl border border-slate-800 p-2 hover:border-green-500/50 transition-all group hover:-translate-y-2">
               <div class="aspect-square rounded-2xl overflow-hidden mb-4 bg-black">
                 <img src={product.image} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div class="p-4">
-                <h3 class="text-lg font-bold text-white mb-4">{product.name}</h3>
+                <h3 class="text-lg font-bold text-white mb-1">{product.name}</h3>
+                <p class="text-slate-500 text-sm mb-6 line-clamp-2 min-h-[40px]">{product.desc}</p>
                 <div class="flex justify-between items-center">
                   <span class="text-xl font-black text-white">฿{product.price.toLocaleString()}</span>
-                  <button onClick={() => addToCart(product)} class="bg-green-500 text-black p-3 rounded-xl active:scale-90">+</button>
+                  <button onClick={() => addToCart(product)} class="bg-green-500 text-black p-3 rounded-xl active:scale-90 shadow-lg shadow-green-500/20">+</button>
                 </div>
               </div>
             </div>
@@ -88,48 +88,49 @@ function App() {
         </section>
       </main>
 
-      {/* --- Cart Modal with Smart Input Control --- */}
+      {/* --- Cart Modal (Fixed Focus) --- */}
       {isCartOpen() && (
         <div class="fixed inset-0 z-[100] flex items-center justify-end md:p-6">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
           <div class="relative bg-slate-900 border-l border-slate-800 w-full max-w-md h-full md:rounded-3xl p-8 shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
             <h2 class="text-2xl font-black text-white mb-8">Your Order</h2>
-            <div class="flex-grow overflow-y-auto space-y-4">
+            <div class="flex-grow overflow-y-auto space-y-4 pr-2">
+              {/* ใช้ cartId เป็น Key สำหรับการวนลูป */}
               <For each={cartItems()}>{(item) => (
-                <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                <div class="flex items-center gap-4 bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
                   <img src={item.image} class="w-16 h-16 rounded-lg object-cover" />
                   <div class="flex-grow">
                     <h4 class="text-sm font-bold text-white leading-tight">{item.name}</h4>
                     <p class="text-green-400 font-bold mb-2">฿{(item.price * item.quantity).toLocaleString()}</p>
                     
-                    {/* --- Input Zone: พิมพ์ได้ กดบวก-ลบได้ --- */}
                     <div class="flex items-center gap-2">
-                      <button onClick={() => updateQuantity(item.id, -1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-red-500 transition-colors">-</button>
+                      <button onClick={() => updateQuantity(item.cartId, -1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-red-500 transition-colors text-white">-</button>
                       
                       <input 
                         type="number" 
                         min="1"
                         value={item.quantity}
                         onInput={(e) => {
-                          const val = parseInt(e.target.value);
-                          updateQuantity(item.id, 0, isNaN(val) ? 1 : val); // พิมพ์เลขปุ๊บ เงินเปลี่ยนปั๊บ
+                          const val = parseInt(e.currentTarget.value);
+                          // อัปเดตผ่าน cartId เพื่อความแม่นยำ
+                          updateQuantity(item.cartId, 0, isNaN(val) ? 1 : val);
                         }}
                         class="w-12 h-7 bg-slate-800 border border-slate-700 rounded-md text-center text-white font-bold text-xs focus:ring-1 focus:ring-green-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
 
-                      <button onClick={() => updateQuantity(item.id, 1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-green-500 transition-colors">+</button>
+                      <button onClick={() => updateQuantity(item.cartId, 1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-green-500 transition-colors text-white">+</button>
                     </div>
                   </div>
-                  <button onClick={() => removeFromCart(item.id)} class="text-slate-500 hover:text-red-500 text-xs">ลบ</button>
+                  <button onClick={() => removeFromCart(item.cartId)} class="text-slate-500 hover:text-red-500 text-xs">ลบ</button>
                 </div>
               )}</For>
             </div>
             <div class="mt-8 pt-6 border-t border-slate-800">
-              <div class="flex justify-between text-2xl font-black text-white mb-6">
+              <div class="flex justify-between text-xl font-black text-white mb-6">
                 <span>Total:</span>
                 <span class="text-green-400">฿{totalPrice().toLocaleString()}</span>
               </div>
-              <button class="w-full bg-green-500 text-black font-black py-4 rounded-2xl shadow-lg active:scale-95" onClick={() => alert(`ยอดชำระ ฿${totalPrice().toLocaleString()} บาท`)}>CHECKOUT</button>
+              <button disabled={cartItems().length === 0} class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" onClick={() => alert(`ยอดชำระ ฿${totalPrice().toLocaleString()} บาท`)}>CHECKOUT</button>
             </div>
           </div>
         </div>
