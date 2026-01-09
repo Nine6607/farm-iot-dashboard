@@ -56,7 +56,7 @@ function App() {
           <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">
             Next-Gen Farm OS
           </h1>
-          <p class="text-slate-500 text-lg max-w-2xl mx-auto">ขีดสุดของเทคโนโลยี เพื่อฟาร์มยุคใหม่</p>
+          <p class="text-slate-500 text-lg max-w-2xl mx-auto">Sขีดสุดของเทคโนโลยี เพื่อฟาร์มยุคใหม่</p>
         </header>
 
         {/* --- SECTION 5: รายการสินค้า (โชว์คำอธิบายสีเทาแล้ว) --- */}
