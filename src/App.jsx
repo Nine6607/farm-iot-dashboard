@@ -117,7 +117,7 @@ function App() {
                 <span>Total:</span>
                 <span class="text-green-400">฿{totalPrice().toLocaleString()}</span>
               </div>
-              <button disabled={cartItems().length === 0} class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" onClick={() => alert(`ส่งยอดรวม ฿${totalPrice().toLocaleString()} เข้าระบบจำลอง!`)}>
+              <button disabled={cartItems().length === 0} class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" onClick={() => alert(`ชำระเงิน${totalPrice().toLocaleString()} บาทเรียบร้อย! ขอบคุณที่อุดหนุน KUYKUB STORE 🌱`)}>
                 CHECKOUT
               </button>
             </div>
