@@ -1,5 +1,8 @@
 import { createSignal, For } from 'solid-js';
 
+/** * [SECTION 1: ฐานข้อมูลสินค้า]
+ * - แก้ไข: เพิ่ม/ลด สินค้าตรงนี้ได้เลย (ท่านแก้ชื่อและคำอธิบายตรงนี้ได้ตลอด)
+ */
 const PRODUCTS = [
   { id: 1, name: "เครื่องให้อาหารไก่อัตโนมัติ(ขนาดเริ่มต้น)", price: 7000, category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT977VY2VZwlLK--cnz56ox7U5DOalBF1FY2Q&s", desc: "ระบบให้อาหารแม่นยำ ตั้งเวลาผ่านมือถือได้" },
   { id: 2, name: "เครื่องรดน้ำอัตโนมัติ(ขนาดเริ่มต้น)", price: 5000, category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyuChUopRp46hphr0Eyd90mJgav9oEW6lHNg&s", desc: "ดูแลสวนของคุณด้วยระบบ AI ประหยัดน้ำ 30%" },
@@ -8,6 +11,7 @@ const PRODUCTS = [
 ];
 
 function App() {
+  /** * [SECTION 2: ระบบจัดการสถานะ] */
   const [cartItems, setCartItems] = createSignal([]);
   const [isCartOpen, setIsCartOpen] = createSignal(false);
 
@@ -27,7 +31,7 @@ function App() {
   return (
     <div class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-green-500 selection:text-white pb-20">
       
-      {/* --- Navbar --- */}
+      {/* --- SECTION 3: Navbar --- */}
       <nav class="flex justify-between items-center p-6 border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
         <div class="text-2xl font-black text-green-400 tracking-tighter flex items-center gap-2">
           <span class="text-3xl">🌱</span> KUY<span class="text-white">KUB</span> STORE
@@ -47,19 +51,35 @@ function App() {
       </nav>
 
       <main class="max-w-7xl mx-auto p-6">
+        {/* --- SECTION 4: Hero --- */}
         <header class="py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">Premium Farm Gear</h1>
+          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">
+            Premium Farm Gear
+          </h1>
+          <p class="text-slate-500 text-lg max-w-2xl mx-auto">Selected hardware for pro farmers.</p>
         </header>
 
+        {/* --- SECTION 5: รายการสินค้า (โชว์คำอธิบายสีเทาแล้ว) --- */}
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <For each={PRODUCTS}>{(product) => (
             <div class="bg-slate-900 rounded-3xl border border-slate-800 p-2 hover:border-green-500/50 transition-all duration-300 group">
               <div class="aspect-square rounded-2xl overflow-hidden relative mb-4 bg-black">
                 <img src={product.image} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100" />
+                <div class="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest">
+                  {product.category}
+                </div>
               </div>
+
               <div class="p-4">
-                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-green-400 transition-colors">{product.name}</h3>
-                <div class="flex justify-between items-center mt-4">
+                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-green-400 transition-colors">
+                  {product.name}
+                </h3>
+                {/* --- คำอธิบายสินค้า (สีเทา) --- */}
+                <p class="text-slate-500 text-sm mb-6 line-clamp-2 min-h-[40px]">
+                  {product.desc}
+                </p>
+                
+                <div class="flex justify-between items-center">
                   <span class="text-xl font-black text-white">฿{product.price.toLocaleString()}</span>
                   <button onClick={() => addToCart(product)} class="bg-green-500 hover:bg-green-400 text-black p-3 rounded-xl transition-all active:scale-90 shadow-lg shadow-green-500/20">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
@@ -71,14 +91,15 @@ function App() {
         </section>
       </main>
 
-      {/* --- Cart Modal --- */}
+      {/* --- SECTION 6: หน้าต่างตะกร้าสินค้า --- */}
       {isCartOpen() && (
         <div class="fixed inset-0 z-[100] flex items-center justify-end md:p-6">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
+          
           <div class="relative bg-slate-900 border-l border-slate-800 w-full max-w-md h-full md:h-auto md:rounded-3xl p-8 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div class="flex justify-between items-center mb-8">
               <h2 class="text-2xl font-black text-white">Your Cart ({cartItems().length})</h2>
-              <button onClick={() => setIsCartOpen(false)} class="bg-slate-800 p-2 rounded-full hover:text-red-400">✕</button>
+              <button onClick={() => setIsCartOpen(false)} class="bg-slate-800 p-2 rounded-full hover:text-red-400 transition-colors">✕</button>
             </div>
 
             <div class="flex-grow overflow-y-auto space-y-4 pr-2">
@@ -89,10 +110,10 @@ function App() {
                     <h4 class="text-sm font-bold text-white leading-tight">{item.name}</h4>
                     <p class="text-green-400 font-bold">฿{item.price.toLocaleString()}</p>
                   </div>
-                  <button onClick={() => removeFromCart(item.cartId)} class="text-slate-500 hover:text-red-500 transition-colors">ลบ</button>
+                  <button onClick={() => removeFromCart(item.cartId)} class="text-slate-500 hover:text-red-500 text-xs font-bold uppercase tracking-wider">ลบ</button>
                 </div>
               )}</For>
-              {cartItems().length === 0 && <p class="text-center text-slate-500 py-10">ตะกร้ายังว่างอยู่นะจ๊ะท่าน CEO</p>}
+              {cartItems().length === 0 && <p class="text-center text-slate-500 py-10 font-medium">ยังไม่มีของในตะกร้า</p>}
             </div>
 
             <div class="mt-8 pt-6 border-t border-slate-800">
@@ -102,8 +123,8 @@ function App() {
               </div>
               <button 
                 disabled={cartItems().length === 0}
-                class="w-full bg-green-500 disabled:bg-slate-700 disabled:cursor-not-allowed hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg"
-                onClick={() => alert(`CEO สั่งซื้อรวม ฿${totalPrice().toLocaleString()} เรียบร้อย!`)}
+                class="w-full bg-green-500 disabled:bg-slate-700 disabled:cursor-not-allowed hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95"
+                onClick={() => alert(`ยอดสั่งซื้อรวม ฿${totalPrice().toLocaleString()} เรียบร้อยครับ`)}
               >
                 CHECKOUT
               </button>
