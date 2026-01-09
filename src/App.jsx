@@ -54,9 +54,9 @@ function App() {
         {/* --- SECTION 4: Hero --- */}
         <header class="py-16 text-center">
           <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">
-            Premium Farm Gear
+            Next-Gen Farm OS
           </h1>
-          <p class="text-slate-500 text-lg max-w-2xl mx-auto">Selected hardware for pro farmers.</p>
+          <p class="text-slate-500 text-lg max-w-2xl mx-auto">ขีดสุดของเทคโนโลยี เพื่อฟาร์มยุคใหม่</p>
         </header>
 
         {/* --- SECTION 5: รายการสินค้า (โชว์คำอธิบายสีเทาแล้ว) --- */}
