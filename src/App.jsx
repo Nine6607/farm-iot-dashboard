@@ -12,36 +12,53 @@ function App() {
   const [isCartOpen, setIsCartOpen] = createSignal(false);
   const [showToast, setShowToast] = createSignal(false);
 
-  // --- [เทพที่ 1: LocalStorage] โหลดข้อมูลตะกร้าตอนเปิดเว็บ ---
+  // โหลดข้อมูลจาก LocalStorage ตอนเปิดเว็บ
   onMount(() => {
     const savedCart = localStorage.getItem('kuykub_cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
-    }
+    if (savedCart) setCartItems(JSON.parse(savedCart));
   });
 
-  // --- [เทพที่ 1: LocalStorage] เซฟข้อมูลทุกครั้งที่ตะกร้าเปลี่ยน ---
+  // เซฟข้อมูลลง LocalStorage ทุกครั้งที่ตะกร้าเปลี่ยน
   createEffect(() => {
     localStorage.setItem('kuykub_cart', JSON.stringify(cartItems()));
   });
 
+  // ฟังก์ชันเพิ่มของลงตะกร้าแบบเช็คสินค้าซ้ำ
   const addToCart = (product) => {
-    setCartItems([...cartItems(), { ...product, cartId: Date.now() }]);
-    // --- [เทพที่ 2: UX Toast] แจ้งเตือนเวลาเพิ่มของสำเร็จ ---
+    const existing = cartItems().find(item => item.id === product.id);
+    if (existing) {
+      updateQuantity(product.id, 1);
+    } else {
+      setCartItems([...cartItems(), { ...product, quantity: 1, cartId: Date.now() }]);
+    }
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
 
-  const removeFromCart = (cartId) => {
-    setCartItems(cartItems().filter(item => item.cartId !== cartId));
+  // ฟังก์ชันปรับเพิ่ม/ลด จำนวนสินค้า
+  const updateQuantity = (id, change) => {
+    setCartItems(cartItems().map(item => {
+      if (item.id === id) {
+        const newQty = Math.max(1, item.quantity + change); // ขั้นต่ำคือ 1
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
   };
 
-  const totalPrice = () => cartItems().reduce((sum, item) => sum + item.price, 0);
+  const removeFromCart = (id) => {
+    setCartItems(cartItems().filter(item => item.id !== id));
+  };
+
+  // คำนวณยอดรวม (ราคา x จำนวน)
+  const totalPrice = () => cartItems().reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // นับจำนวนชิ้นทั้งหมดในตะกร้า
+  const totalQty = () => cartItems().reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-green-500 selection:text-white pb-20">
       
-      {/* --- Toast Notification --- */}
+      {/* Toast Notification */}
       <div class={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-green-500 text-black px-6 py-3 rounded-full font-bold shadow-2xl transition-all duration-300 ${showToast() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
         เพิ่มสินค้าลงตะกร้าแล้ว! 🛒
       </div>
@@ -53,9 +70,9 @@ function App() {
         
         <button onClick={() => setIsCartOpen(true)} class="relative bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-green-400 transition-all active:scale-95 shadow-xl">
           Cart
-          {cartItems().length > 0 && (
+          {totalQty() > 0 && (
             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full ring-2 ring-slate-950 animate-bounce">
-              {cartItems().length}
+              {totalQty()}
             </span>
           )}
         </button>
@@ -63,9 +80,7 @@ function App() {
 
       <main class="max-w-7xl mx-auto p-6">
         <header class="py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000">
-            Next-Gen Farm Gear
-          </h1>
+          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight">Next-Gen Farm Gear</h1>
           <p class="text-slate-500 text-lg max-w-2xl mx-auto">ขีดสุดของเทคโนโลยี เพื่อฟาร์มยุคใหม่</p>
         </header>
 
@@ -90,24 +105,30 @@ function App() {
         </section>
       </main>
 
-      {/* --- Cart Modal --- */}
+      {/* --- Cart Modal with Quantity Control --- */}
       {isCartOpen() && (
         <div class="fixed inset-0 z-[100] flex items-center justify-end md:p-6">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
           <div class="relative bg-slate-900 border-l border-slate-800 w-full max-w-md h-full md:h-auto md:rounded-3xl p-8 shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
             <div class="flex justify-between items-center mb-8">
-              <h2 class="text-2xl font-black text-white">Your Cart ({cartItems().length})</h2>
-              <button onClick={() => setIsCartOpen(false)} class="bg-slate-800 p-2 rounded-full hover:text-red-400 transition-colors">✕</button>
+              <h2 class="text-2xl font-black text-white">Your Cart ({totalQty()})</h2>
+              <button onClick={() => setIsCartOpen(false)} class="bg-slate-800 p-2 rounded-full hover:text-red-400">✕</button>
             </div>
             <div class="flex-grow overflow-y-auto space-y-4 pr-2">
               <For each={cartItems()}>{(item) => (
-                <div class="flex items-center gap-4 bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50 animate-in fade-in zoom-in duration-300">
+                <div class="flex items-center gap-4 bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
                   <img src={item.image} class="w-16 h-16 rounded-lg object-cover" />
                   <div class="flex-grow">
                     <h4 class="text-sm font-bold text-white leading-tight">{item.name}</h4>
-                    <p class="text-green-400 font-bold">฿{item.price.toLocaleString()}</p>
+                    <p class="text-green-400 font-bold">฿{(item.price * item.quantity).toLocaleString()}</p>
+                    {/* ปุ่มบวก-ลบจำนวน */}
+                    <div class="flex items-center gap-3 mt-2">
+                      <button onClick={() => updateQuantity(item.id, -1)} class="w-6 h-6 bg-slate-700 rounded-md flex items-center justify-center hover:bg-red-500">-</button>
+                      <span class="text-white font-bold text-sm">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.id, 1)} class="w-6 h-6 bg-slate-700 rounded-md flex items-center justify-center hover:bg-green-500">+</button>
+                    </div>
                   </div>
-                  <button onClick={() => removeFromCart(item.cartId)} class="text-slate-500 hover:text-red-500 text-xs font-bold uppercase">ลบ</button>
+                  <button onClick={() => removeFromCart(item.id)} class="text-slate-500 hover:text-red-500 text-xs font-bold uppercase">ลบ</button>
                 </div>
               )}</For>
               {cartItems().length === 0 && <p class="text-center text-slate-500 py-10">เหงาจัง... ยังไม่มีของเลย</p>}
@@ -117,7 +138,7 @@ function App() {
                 <span>Total:</span>
                 <span class="text-green-400">฿{totalPrice().toLocaleString()}</span>
               </div>
-              <button disabled={cartItems().length === 0} class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" onClick={() => alert(`ชำระเงิน${totalPrice().toLocaleString()} บาทเรียบร้อย! ขอบคุณที่อุดหนุน KUYKUB STORE 🌱`)}>
+              <button disabled={cartItems().length === 0} class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" onClick={() => alert(`ชำระเงินรวม ฿${totalPrice().toLocaleString()} บาทเรียบร้อย!`)}>
                 CHECKOUT
               </button>
             </div>
