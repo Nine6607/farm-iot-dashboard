@@ -50,7 +50,7 @@ function App() {
         
         {/* ฝั่งซ้าย: โลโก้ */}
         <div class="text-2xl font-black text-cyan-400 flex items-center gap-2 tracking-wide hover:scale-105 transition-transform cursor-pointer">
-          ⚙️ PNPK
+          ⚙️ PNPK Automation Team
         </div>
 
         {/* ตรงกลาง: เมนูแบบในรูป (ซ่อนในมือถือ โชว์เฉพาะจอคอม) */}
