@@ -57,7 +57,7 @@ function App() {
       </div>
 
       <nav class="flex justify-between items-center p-6 border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div class="text-2xl font-black text-green-400 flex items-center gap-2">🌱 KUYKUB STORE</div>
+        <div class="text-2xl font-black text-green-400 flex items-center gap-2">PNPK Automation Team</div>
         <button onClick={() => setIsCartOpen(true)} class="relative bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-green-400 transition-all active:scale-95 shadow-xl">
           Cart {totalQty() > 0 && `(${totalQty()})`}
         </button>
@@ -66,7 +66,7 @@ function App() {
       <main class="max-w-7xl mx-auto p-6">
         <header class="py-16 text-center">
           <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000">Next-Gen Farm Gear</h1>
-          <p class="text-slate-500 text-lg max-w-2xl mx-auto">ขีดสุดของเทคโนโลยี เพื่อฟาร์มยุคใหม่</p>
+          <p class="text-slate-500 text-lg max-w-2xl mx-auto">ที่สุดของงานAutomation และงานงานออกแบบครบวงจรสำหรับคุณ</p>
         </header>
 
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
