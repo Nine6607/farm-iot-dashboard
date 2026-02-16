@@ -1,11 +1,11 @@
 import { createSignal, For, onMount, createEffect } from 'solid-js';
 
 const PRODUCTS = [
-  { id: 1, name: "งานติดตั้งระบบ Automation", category: "Service", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT977VY2VZwlLK--cnz56ox7U5DOalBF1FY2Q&s", desc: "ติดตั้งระบบ Automation ครบวงจรสำหรับฟาร์มของคุณ" },
-  { id: 2, name: "งานออกแบบ 2D & Drawing", category: "Service", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyuChUopRp46hphr0Eyd90mJgav9oEW6lHNg&s", desc: "ออกแบบแผนผังที่คุณต้องการ" },
-  { id: 3, name: "งานออกแบบ 3D & Drawing", category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEe22g6QH5R4B6ka7vEbEjoj23UPPkyqHBzA&s", desc: "ออกแบบระบบ 3D สำหรับฟาร์มของคุณ" },
-  { id: 4, name: "งานติดตั้งระบบกล้อง CCTV", category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEe22g6QH5R4B6ka7vEbEjoj23UPPkyqHBzA&s", desc: "ติดตั้งกล้องวงจรปิดสำหรับฟาร์มของคุณ" },
-  { id: 5, name: "งานออกแบบระบบควบคุมอัตโนมัติ", category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEe22g6QH5R4B6ka7vEbEjoj23UPPkyqHBzA&s", desc: "ออกแบบระบบควบคุมอัตโนมัติ สำหรับฟาร์มของคุณ" },
+  { id: 1, name: "งานติดตั้งระบบ Automation", category: "Service", image: "", desc: "ติดตั้งระบบ Automation ครบวงจรสำหรับฟาร์มของคุณ" },
+  { id: 2, name: "งานออกแบบ 2D & Drawing", category: "Service", image: "", desc: "ออกแบบแผนผังที่คุณต้องการ" },
+  { id: 3, name: "งานออกแบบ 3D & Drawing", category: "AUTOMATION", image: "", desc: "ออกแบบระบบ 3D สำหรับฟาร์มของคุณ" },
+  { id: 4, name: "งานติดตั้งระบบกล้อง CCTV", category: "AUTOMATION", image: "", desc: "ติดตั้งกล้องวงจรปิดสำหรับฟาร์มของคุณ" },
+  { id: 5, name: "งานออกแบบระบบควบคุมอัตโนมัติ", category: "AUTOMATION", image: "", desc: "ออกแบบระบบควบคุมอัตโนมัติ สำหรับฟาร์มของคุณ" },
   { id: 6, name: "งานติดตั้งระบบควบคุมอัตโนมัติ", category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEe22g6QH5R4B6ka7vEbEjoj23UPPkyqHBzA&s", desc: "ติดตั้งระบบควบคุมอัตโนมัติ สำหรับฟาร์มของคุณ" },
 
 ];
