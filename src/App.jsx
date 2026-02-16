@@ -137,7 +137,7 @@ function App() {
                 disabled={cartItems().length === 0} 
                 class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" 
                 onClick={() => {
-                  alert(`ยอดชำระ ฿${totalPrice().toLocaleString()} บาทเรียบร้อย! ขอบคุณที่อุดหนุน KUYKUB STORE 🌱`);
+                  alert(`ยอดชำระ ฿${totalPrice().toLocaleString()} บาทเรียบร้อย! ขอบคุณที่อุดหนุนครับ`);
                   setIsCartOpen(false); // ปิดตะกร้าทันทีหลัง Checkout
                   setCartItems([]); // ล้างตะกร้าให้พร้อมสำหรับลูกค้ารายใหม่ (หรือลบทิ้งถ้าอยากให้ค้างไว้)
                 }}
