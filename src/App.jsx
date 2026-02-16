@@ -1,14 +1,12 @@
 import { createSignal, For, onMount, createEffect } from 'solid-js';
 
-// สังเกตว่า PRODUCTS ไม่มี price ก็ไม่พังแล้วครับ!
-const PRODUCTS = [
-  { id: 1, name: "งานติดตั้งระบบ Automation", category: "Service", image: "", desc: "ติดตั้งระบบ Automation ครบวงจรสำหรับฟาร์มของคุณ" },
-  { id: 2, name: "งานออกแบบ 2D & Drawing", category: "Service", image: "", desc: "ออกแบบแผนผังที่คุณต้องการ" },
-  { id: 3, name: "งานออกแบบ 3D & Drawing", category: "AUTOMATION", image: "", desc: "ออกแบบระบบ 3D สำหรับฟาร์มของคุณ" },
-  { id: 4, name: "งานติดตั้งระบบกล้อง CCTV", category: "AUTOMATION", image: "", desc: "ติดตั้งกล้องวงจรปิดสำหรับฟาร์มของคุณ" },
-  { id: 5, name: "งานออกแบบระบบควบคุมอัตโนมัติ", category: "AUTOMATION", image: "", desc: "ออกแบบระบบควบคุมอัตโนมัติ สำหรับฟาร์มของคุณ" },
-  // สมมติถ้างานไหนมีราคาตายตัว ท่านก็แค่เติม price: 5000 เข้าไป มันก็จะแสดงราคาปกติครับ!
-  { id: 6, name: "งานติดตั้งระบบควบคุมอัตโนมัติ", category: "AUTOMATION", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEe22g6QH5R4B6ka7vEbEjoj23UPPkyqHBzA&s", desc: "ติดตั้งระบบควบคุมอัตโนมัติ สำหรับฟาร์มของคุณ" },
+// เปลี่ยนจาก PRODUCTS เป็น SERVICES และใส่รายละเอียดงานของท่าน
+const SERVICES = [
+  { id: 1, name: "บริการให้คำปรึกษา & วางแผนโครงการ", category: "PLANNING", image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=500&auto=format&fit=crop", desc: "วางแผนผังการทำงาน (Workflow) และประเมินงบประมาณก่อนติดตั้งจริง เพื่อความคุ้มค่าสูงสุด" },
+  { id: 2, name: "งานออกแบบ 2D & 3D Drawing", category: "DESIGN", image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=500&auto=format&fit=crop", desc: "เขียนแบบวิศวกรรม ออกแบบตู้คอนโทรล เครื่องจักร และระบบกลไกด้วยซอฟต์แวร์มาตรฐาน" },
+  { id: 3, name: "รับติดตั้งระบบ Automation ครบวงจร", category: "INSTALLATION", image: "https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=500&auto=format&fit=crop", desc: "ติดตั้งระบบ PLC, HMI, เซ็นเซอร์ และระบบนิวเมติกส์ พร้อมเขียนโปรแกรมควบคุม" },
+  { id: 4, name: "บริการติดตั้งกล้องวงจรปิด (CCTV)", category: "SECURITY", image: "https://images.unsplash.com/photo-1557597774-9d273605dfa9?q=80&w=500&auto=format&fit=crop", desc: "ติดตั้งระบบรักษาความปลอดภัย ดูออนไลน์ได้ 24 ชม. พร้อมระบบ AI ตรวจจับความเคลื่อนไหว" },
+  { id: 5, name: "งานวางระบบโครงสร้างข่ายสายไฟ", category: "WIRING", image: "https://images.unsplash.com/photo-1517420704952-d9f397412122?q=80&w=500&auto=format&fit=crop", desc: "เดินสายไฟอุตสาหกรรม จัดสายเข้าตู้คอนโทรล มาตรฐานความปลอดภัยสูง" },
 ];
 
 function App() {
@@ -17,78 +15,69 @@ function App() {
   const [showToast, setShowToast] = createSignal(false);
 
   onMount(() => {
-    const savedCart = localStorage.getItem('kuykub_cart');
+    const savedCart = localStorage.getItem('pnpk_services');
     if (savedCart) setCartItems(JSON.parse(savedCart));
   });
 
   createEffect(() => {
-    localStorage.setItem('kuykub_cart', JSON.stringify(cartItems()));
+    localStorage.setItem('pnpk_services', JSON.stringify(cartItems()));
   });
 
-  const addToCart = (product) => {
-    const existing = cartItems().find(item => item.id === product.id);
-    if (existing) {
-      updateQuantity(existing.cartId, 1);
+  const addToCart = (service) => {
+    const existing = cartItems().find(item => item.id === service.id);
+    if (!existing) {
+      setCartItems([...cartItems(), { ...service, quantity: 1, cartId: Date.now() }]);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
     } else {
-      setCartItems([...cartItems(), { ...product, quantity: 1, cartId: Date.now() }]);
+      alert("รายการนี้ถูกเพิ่มในใบเสนอราคาแล้วครับ");
     }
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
-  };
-
-  const updateQuantity = (cartId, change, absoluteValue = null) => {
-    setCartItems(cartItems().map(item => {
-      if (item.cartId === cartId) {
-        let newQty = absoluteValue !== null ? absoluteValue : item.quantity + change;
-        return { ...item, quantity: Math.max(1, newQty) };
-      }
-      return item;
-    }));
   };
 
   const removeFromCart = (cartId) => {
     setCartItems(cartItems().filter(item => item.cartId !== cartId));
   };
 
-  // กันเหนียว: ถ้าราคาไม่มี (undefined) ให้ตีเป็น 0 ไปก่อน ระบบจะได้ไม่พัง
-  const totalPrice = () => cartItems().reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
-  const totalQty = () => cartItems().reduce((sum, item) => sum + item.quantity, 0);
-
   return (
-    <div class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-green-500 selection:text-white pb-20">
+    // เปลี่ยนโทนสี selection เป็นสีฟ้า (cyan)
+    <div class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-cyan-500 selection:text-white pb-20">
       
-      <div class={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-green-500 text-black px-6 py-3 rounded-full font-bold shadow-2xl transition-all duration-300 ${showToast() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
-        เพิ่มลงรายการแล้ว! 🛒
+      <div class={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-cyan-500 text-black px-6 py-3 rounded-full font-bold shadow-2xl transition-all duration-300 ${showToast() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+        เพิ่มลงรายการขอใบเสนอราคาแล้ว! 📋
       </div>
 
       <nav class="flex justify-between items-center p-6 border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div class="text-2xl font-black text-green-400 flex items-center gap-2">PNPK Automation Team</div>
-        <button onClick={() => setIsCartOpen(true)} class="relative bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-green-400 transition-all active:scale-95 shadow-xl">
-          List {totalQty() > 0 && `(${totalQty()})`}
+        <div class="text-2xl font-black text-cyan-400 flex items-center gap-2">⚙️ PNPK TEAM</div>
+        <button onClick={() => setIsCartOpen(true)} class="relative bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-cyan-400 transition-all active:scale-95 shadow-xl">
+          Quotation {cartItems().length > 0 && `(${cartItems().length})`}
         </button>
       </nav>
 
       <main class="max-w-7xl mx-auto p-6">
         <header class="py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000">PNPK Automation Team</h1>
-          <p class="text-slate-500 text-lg max-w-2xl mx-auto">ที่สุดของงาน Automation และงานออกแบบครบวงจรสำหรับคุณ</p>
+          {/* เปลี่ยนคำโปรยหลักให้ดูเป็นงานวิศวกรรม */}
+          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-cyan-600 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000 uppercase">Industrial Automation</h1>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-8">บริการวางแผน ออกแบบ 2D/3D และรับติดตั้งระบบควบคุมอัตโนมัติ กล้อง CCTV แบบครบวงจร (Turnkey Solutions)</p>
+          <button class="bg-cyan-500 hover:bg-cyan-400 text-black px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/20 active:scale-95">ติดต่อทีมวิศวกรด่วน</button>
         </header>
 
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <For each={PRODUCTS}>{(product) => (
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 p-2 hover:border-green-500/50 transition-all group hover:-translate-y-2">
-              <div class="aspect-square rounded-2xl overflow-hidden mb-4 bg-black relative">
-                <img src={product.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop'} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" />
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <For each={SERVICES}>{(service) => (
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 p-2 hover:border-cyan-500/50 transition-all group hover:-translate-y-2 flex flex-col">
+              <div class="aspect-video rounded-2xl overflow-hidden mb-4 bg-black relative">
+                <img src={service.image} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-70 group-hover:opacity-100" />
+                <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-cyan-400 text-xs font-bold px-3 py-1 rounded-full border border-cyan-500/30">
+                  {service.category}
+                </div>
               </div>
-              <div class="p-4">
-                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-green-400 transition-colors">{product.name}</h3>
-                <p class="text-slate-500 text-sm mb-6 line-clamp-2 min-h-[40px]">{product.desc}</p>
-                <div class="flex justify-between items-center">
-                  {/* ถ้าราคาไม่มี ให้โชว์คำว่า ประเมินหน้างาน */}
-                  <span class="text-lg font-bold text-green-400">
-                    {product.price ? `฿${product.price.toLocaleString()}` : 'ประเมินหน้างาน'}
-                  </span>
-                  <button onClick={() => addToCart(product)} class="bg-green-500 hover:bg-green-400 text-black p-3 rounded-xl transition-all active:scale-90 shadow-lg shadow-green-500/20">+</button>
+              <div class="p-4 flex-grow flex flex-col">
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">{service.name}</h3>
+                <p class="text-slate-500 text-sm mb-6 flex-grow">{service.desc}</p>
+                <div class="flex justify-between items-center mt-auto">
+                  <span class="text-md font-bold text-slate-400 border border-slate-700 px-3 py-1 rounded-lg">ประเมินหน้างาน</span>
+                  <button onClick={() => addToCart(service)} class="bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl transition-all active:scale-90 font-bold shadow-lg shadow-cyan-500/20 text-sm">
+                    สนใจบริการนี้
+                  </button>
                 </div>
               </div>
             </div>
@@ -96,64 +85,44 @@ function App() {
         </section>
       </main>
 
-      {/* --- Cart Modal --- */}
+      {/* --- RFQ Modal (แบบขอใบเสนอราคา) --- */}
       {isCartOpen() && (
         <div class="fixed inset-0 z-[100] flex items-center justify-end md:p-6">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
-          <div class="relative bg-slate-900 border-l border-slate-800 w-full max-w-md h-full md:h-auto md:rounded-3xl p-8 shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
-            <div class="flex justify-between items-center mb-8">
-              <h2 class="text-2xl font-black text-white">รายการที่สนใจ ({totalQty()})</h2>
+          <div class="relative bg-slate-900 border-l border-slate-800 w-full max-w-md h-full md:h-auto md:max-h-[90vh] md:rounded-3xl p-8 shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-black text-white">รายการขอใบเสนอราคา</h2>
               <button onClick={() => setIsCartOpen(false)} class="bg-slate-800 p-2 rounded-full hover:text-red-400 transition-colors">✕</button>
             </div>
             
-            <div class="flex-grow overflow-y-auto space-y-4 pr-2">
+            <p class="text-sm text-cyan-400 mb-4 bg-cyan-500/10 p-3 rounded-xl border border-cyan-500/20">
+              * ทีมงาน PNPK จะติดต่อกลับเพื่อประเมินราคาตามขอบเขตงานจริงครับ
+            </p>
+
+            <div class="flex-grow overflow-y-auto space-y-3 pr-2 mb-6">
               <For each={cartItems()}>{(item) => (
                 <div class="flex items-center gap-4 bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
-                  <img src={item.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=150&auto=format&fit=crop'} class="w-16 h-16 rounded-lg object-cover" />
                   <div class="flex-grow">
                     <h4 class="text-sm font-bold text-white leading-tight">{item.name}</h4>
-                    <p class="text-green-400 font-bold mb-2">
-                      {item.price ? `฿${(item.price * item.quantity).toLocaleString()}` : 'รอประเมินราคา'}
-                    </p>
-                    <div class="flex items-center gap-2">
-                      <button onClick={() => updateQuantity(item.cartId, -1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-red-500 transition-colors text-white">-</button>
-                      <input 
-                        type="number" 
-                        min="1"
-                        value={item.quantity}
-                        onInput={(e) => {
-                          const val = parseInt(e.currentTarget.value);
-                          updateQuantity(item.cartId, 0, isNaN(val) ? 1 : val);
-                        }}
-                        class="w-12 h-7 bg-slate-800 border border-slate-700 rounded-md text-center text-white font-bold text-xs focus:ring-1 focus:ring-green-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button onClick={() => updateQuantity(item.cartId, 1)} class="w-7 h-7 bg-slate-700 rounded-md flex items-center justify-center hover:bg-green-500 transition-colors text-white">+</button>
-                    </div>
+                    <span class="text-xs text-slate-500">{item.category}</span>
                   </div>
-                  <button onClick={() => removeFromCart(item.cartId)} class="text-slate-500 hover:text-red-500 text-xs">ลบ</button>
+                  <button onClick={() => removeFromCart(item.cartId)} class="text-red-400 bg-red-400/10 px-3 py-1 rounded-lg hover:bg-red-500 hover:text-white transition-colors text-xs font-bold">ลบทิ้ง</button>
                 </div>
               )}</For>
-              {cartItems().length === 0 && <p class="text-center text-slate-500 py-10">ยังไม่มีรายการที่เลือกครับ</p>}
+              {cartItems().length === 0 && <p class="text-center text-slate-500 py-10">ยังไม่ได้เลือกบริการที่สนใจครับ</p>}
             </div>
 
-            <div class="mt-8 pt-6 border-t border-slate-800">
-              <div class="flex justify-between text-xl font-black text-white mb-6">
-                <span>ยอดรวมเบื้องต้น:</span>
-                <span class="text-green-400">
-                  {totalPrice() > 0 ? `฿${totalPrice().toLocaleString()}` : 'ตามตกลง'}
-                </span>
-              </div>
-              
+            <div class="border-t border-slate-800 pt-6 mt-auto">
               <button 
                 disabled={cartItems().length === 0} 
-                class="w-full bg-green-500 disabled:bg-slate-700 hover:bg-green-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95" 
+                class="w-full bg-cyan-500 disabled:bg-slate-700 hover:bg-cyan-400 text-black font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 flex items-center justify-center gap-2" 
                 onClick={() => {
-                  alert(`ส่งรายการเข้าสู่ระบบเพื่อรอทีมงาน PNPK ติดต่อกลับแล้วครับ!`);
+                  alert(`ระบบบันทึกคำขอของคุณเรียบร้อยแล้ว ทีมวิศวกรจะรีบติดต่อกลับครับ!`);
                   setIsCartOpen(false); 
                   setCartItems([]); 
                 }}
               >
-                ส่งรายการขอใบเสนอราคา
+                ส่งข้อมูลให้ทีมวิศวกร 🚀
               </button>
             </div>
           </div>
