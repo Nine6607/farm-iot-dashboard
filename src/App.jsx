@@ -65,7 +65,7 @@ function App() {
 
       <main class="max-w-7xl mx-auto p-6">
         <header class="py-16 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000">Next-Gen Farm Gear</h1>
+          <h1 class="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-b from-white to-slate-500 text-transparent bg-clip-text tracking-tight animate-in fade-in slide-in-from-top-4 duration-1000">PNPK Automation Team</h1>
           <p class="text-slate-500 text-lg max-w-2xl mx-auto">ที่สุดของงานAutomation และงานงานออกแบบครบวงจรสำหรับคุณ</p>
         </header>
 
