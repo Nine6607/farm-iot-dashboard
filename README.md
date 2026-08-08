@@ -1,11 +1,10 @@
 ## Usage
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
-
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+This project uses npm (`package-lock.json`) as its single package manager. Don't add a `pnpm-lock.yaml` or `yarn.lock` alongside it — having more than one lockfile makes Vercel's package-manager auto-detection ambiguous and can silently break deploys.
 
 ```bash
-$ npm install # or pnpm install or yarn install
+$ npm install
+$ npm run dev   # http://localhost:3000
 ```
 
 ### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
